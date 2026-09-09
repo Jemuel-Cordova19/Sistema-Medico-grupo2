@@ -1,0 +1,1 @@
+console.log("Módulo JS de Atención Médica Cargado");
