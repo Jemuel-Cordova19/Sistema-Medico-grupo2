@@ -1,8 +1,13 @@
 {
+  "version": 2,
   "builds": [
     {
       "src": "backend/main.py",
       "use": "@vercel/python"
+    },
+    {
+      "src": "index.html",
+      "use": "@vercel/static"
     },
     {
       "src": "frontend/**",
@@ -15,12 +20,12 @@
       "dest": "backend/main.py"
     },
     {
-      "src": "/",
-      "dest": "/frontend/index.html"
+      "src": "/api",
+      "dest": "backend/main.py"
     },
     {
       "src": "/(.*)",
-      "dest": "/frontend/$1"
+      "dest": "/$1"
     }
   ]
 }
