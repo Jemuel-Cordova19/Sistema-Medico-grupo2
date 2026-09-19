@@ -1,30 +1,54 @@
-from fastapi import FastAPI
+# Importamos la clase FastAPI y la dependencia de sesión de SQLAlchemy
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.orm import Session
+from sqlalchemy import text
 
-# Importación de routers por integrante
-from backend.routers import auth_medico, admin_jimena, recepcion_melissa, medico_historial
+# Importamos la base de datos, el motor y la base declarativa
+from backend.database import get_db, engine, Base
 
+# Importamos los modelos para que SQLAlchemy los reconozca al crear las tablas
+from backend import models
+
+# Esta instrucción crea automáticamente todas las tablas en Supabase
+Base.metadata.create_all(bind=engine)
+
+# Inicializamos la aplicación FastAPI
 app = FastAPI(
-    title="Sistema Médico G2 API",
-    description="API RESTful para gestión de clínica médica",
+    title="Sistema Médico API - Grupo 2",
+    description="API REST para la gestión de citas, consultas, recetas y caja",
     version="1.0.0"
 )
 
-# Configuración de CORS
+# Configuración de CORS para permitir la conexión desde cualquier cliente/frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=["*"], # Permite peticiones de cualquier origen
+    allow_credentials=True, # Permite el envío de credenciales
+    allow_methods=["*"], # Permite todos los métodos HTTP
+    allow_headers=["*"] # Permite todos los encabezados HTTP
 )
 
-# Registro de routers
-app.include_router(auth_medico.router, prefix="/api/auth", tags=["Autenticación"])
-app.include_router(admin_jimena.router, prefix="/api/admin", tags=["Administración (Jimena)"])
-app.include_router(recepcion_melissa.router, prefix="/api/recepcion", tags=["Recepción (Melissa)"])
-app.include_router(medico_historial.router, prefix="/api/medico", tags=["Médico & Historial"])
+# Ruta raíz de comprobación de estado del servidor
+@app.get("/")
+def read_root():
+    # Retorna un estado informativo
+    return {"status": "ok", "message": "API del Sistema Médico en ejecución"}
 
-@app.get("/api")
-def root():
-    return {"status": "ok", "message": "API del Sistema Médico G2 funcionando correctamente"}
+# Ruta para verificar la comunicación directa con PostgreSQL en Supabase
+@app.get("/test-db")
+def test_db_connection(db: Session = Depends(get_db)):
+    try:
+        # Ejecutamos una consulta SQL para verificar la versión instalada de PostgreSQL
+        result = db.execute(text("SELECT version();")).fetchone()
+        return {
+            "status": "success",
+            "message": "Conexión exitosa a Supabase PostgreSQL",
+            "db_version": result[0]
+        }
+    except Exception as e:
+        # En caso de error de conexión, se retorna una respuesta HTTP 500
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error al conectar con la base de datos: {str(e)}"
+        )
