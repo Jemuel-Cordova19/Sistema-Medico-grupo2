@@ -9,7 +9,7 @@ from backend.database import get_db, engine, Base
 
 # Importamos los modelos para que SQLAlchemy los reconozca al crear las tablas
 from backend import models
-
+from backend.routers.auth_medico import enrutador_autenticacion_medico
 # Esta instrucción crea automáticamente todas las tablas en Supabase
 Base.metadata.create_all(bind=engine)
 
@@ -52,3 +52,4 @@ def test_db_connection(db: Session = Depends(get_db)):
             status_code=500,
             detail=f"Error al conectar con la base de datos: {str(e)}"
         )
+app.include_router(enrutador_autenticacion_medico) 
