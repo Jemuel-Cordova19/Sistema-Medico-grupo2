@@ -1,3 +1,122 @@
 <!DOCTYPE html>
-<html lang="es"><head><meta charset="UTF-8"><title>Recetas Médicas</title><link rel="stylesheet" href="../css/styles.css"></head>
-<body><div class="container"><h1>Emisión de Recetas</h1><a href="medico_panel.html" class="btn">Volver</a></div></body></html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emisión de Receta Médica</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f6f9; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .acciones-bar { display: flex; justify-content: space-between; margin-bottom: 25px; }
+        .btn { padding: 8px 15px; border-radius: 4px; text-decoration: none; border: none; cursor: pointer; font-weight: bold; }
+        .btn-volver { background-color: #6c757d; color: white; }
+        .btn-imprimir { background-color: #28a745; color: white; }
+        .btn:hover { opacity: 0.9; }
+
+        /* Estilo formal de receta médica */
+        .receta-header { text-align: center; border-bottom: 2px solid #007bff; padding-bottom: 15px; margin-bottom: 20px; }
+        .receta-header h1 { color: #007bff; margin: 0; font-size: 24px; }
+        .receta-header p { color: #555; margin: 5px 0 0; font-size: 14px; }
+        
+        .info-paciente { background: #fafafa; border: 1px solid #ddd; padding: 15px; border-radius: 6px; margin-bottom: 20px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; font-size: 14px; }
+        .info-paciente div span { font-weight: bold; color: #444; }
+
+        .cuerpo-receta { margin-top: 20px; min-height: 250px; }
+        .seccion-titulo { font-weight: bold; color: #007bff; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 10px; margin-top: 20px; }
+        .contenido-texto { font-size: 15px; color: #333; line-height: 1.6; white-space: pre-line; }
+
+        .firma-box { margin-top: 60px; text-align: center; }
+        .firma-linea { display: inline-block; width: 250px; border-top: 1px solid #333; padding-top: 5px; font-weight: bold; color: #333; }
+
+        /* Ocultar botones al momento de imprimir el PDF */
+        @media print {
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; padding: 0; }
+            .acciones-bar { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Barra superior con botones de acción -->
+    <div class="acciones-bar">
+        <a href="medico_panel.html" class="btn btn-volver">← Volver al Panel</a>
+        <button onclick="window.print()" class="btn btn-imprimir"> Imprimir / Guardar PDF</button>
+    </div>
+
+    <!-- Encabezado formal de la clínica / receta -->
+    <div class="receta-header">
+        <h1>SISTEMA MÉDICO INTEGRAL</h1>
+        <p>Clínica Médica General y Especialidades</p>
+        <p>Dr. Asignado | Colegiado Profesional</p>
+    </div>
+
+    <!-- Datos generales -->
+    <div class="info-paciente" id="info-paciente">
+        <div><span>Fecha:</span> <span id="lbl-fecha">Cargando...</span></div>
+        <div><span>ID de Cita:</span> <span id="lbl-cita">Cargando...</span></div>
+        <div><span>Paciente ID:</span> <span id="lbl-paciente">Cargando...</span></div>
+    </div>
+
+    <!-- Cuerpo de la Receta -->
+    <div class="cuerpo-receta">
+        <div class="seccion-titulo">Diagnóstico Médico</div>
+        <div class="contenido-texto" id="lbl-diagnostico">Cargando diagnóstico...</div>
+
+        <div class="seccion-titulo">Prescripción y Tratamiento Indicado</div>
+        <div class="contenido-texto" id="lbl-tratamiento">Cargando tratamiento...</div>
+    </div>
+
+    <!-- Firma del médico -->
+    <div class="firma-box">
+        <div class="firma-linea">Firma y Sello del Médico</div>
+    </div>
+</div>
+
+<script>
+    /* Aquí inicia la lógica para cargar los datos de la consulta y rellenar la receta médica */
+    document.addEventListener("DOMContentLoaded", async () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const idCita = urlParams.get("id_cita");
+        const pacienteId = urlParams.get("paciente_id");
+
+        if (!pacienteId) {
+            alert("No se especificó el paciente para emitir la receta.");
+            return;
+        }
+
+        document.getElementById("lbl-cita").textContent = idCita || "N/A";
+        document.getElementById("lbl-paciente").textContent = pacienteId;
+
+        try {
+            // Consultamos el historial del paciente para extraer los datos de su última consulta
+            const response = await fetch(`http://127.0.0.1:8000/medico/historial-paciente/${pacienteId}`);
+            const historial = await response.json();
+
+            if (!historial || historial.length === 0) {
+                alert("No se encontraron registros de consultas para este paciente.");
+                return;
+            }
+
+            // Si viene un id_cita específico, buscamos esa consulta; si no, tomamos la más reciente
+            let consulta = historial[0];
+            if (idCita) {
+                const encontrada = historial.find(h => h.id == idCita);
+                if (encontrada) consulta = encontrada;
+            }
+
+            // Rellenamos los campos en la plantilla de la receta
+            document.getElementById("lbl-fecha").textContent = consulta.fecha_hora || consulta.fecha_creacion || "Fecha no registrada";
+            document.getElementById("lbl-diagnostico").textContent = consulta.diagnostico || "Sin diagnóstico registrado";
+            document.getElementById("lbl-tratamiento").textContent = consulta.tratamiento_indicado || "Sin tratamiento especificado";
+
+        } catch (error) {
+            console.error("Error al cargar los datos de la receta:", error);
+            alert("Error al conectar con el servidor para generar la receta.");
+        }
+    });
+</script>
+
+</body>
+</html>

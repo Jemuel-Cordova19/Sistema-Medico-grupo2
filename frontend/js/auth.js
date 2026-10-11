@@ -21,24 +21,22 @@ document.addEventListener("DOMContentLoaded", () => {
     // -------------------------------------------------------------
     if (botonTogglePassword && campoContrasena) {
         botonTogglePassword.addEventListener("click", (e) => {
-            e.preventDefault(); // Evita que envíe el formulario al hacer clic
+            e.preventDefault();
             
             const esPassword = campoContrasena.getAttribute("type") === "password";
             campoContrasena.setAttribute("type", esPassword ? "text" : "password");
             
-            // Cambiar el texto del botón según el estado
             botonTogglePassword.textContent = esPassword ? "Ocultar" : "Mostrar";
         });
     }
 
     // -------------------------------------------------------------
-    // FUNCIONALIDAD 2: Procesar Login y Mostrar Errores
+    // FUNCIONALIDAD 2: Procesar Login y Guardar Sesión
     // -------------------------------------------------------------
     if (formulario) {
         formulario.addEventListener("submit", async function(evento) {
             evento.preventDefault();
 
-            // Limpiar mensaje de error previo
             if (contenedorError) {
                 contenedorError.textContent = "";
                 contenedorError.style.display = "none";
@@ -47,7 +45,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const valorUsuario = campoUsuario ? campoUsuario.value.trim() : "";
             const valorContrasena = campoContrasena ? campoContrasena.value.trim() : "";
 
-            // Validación básica en frontend
             if (!valorUsuario || !valorContrasena) {
                 mostrarMensajeError("Por favor, ingrese usuario y contraseña.");
                 return;
@@ -70,36 +67,35 @@ document.addEventListener("DOMContentLoaded", () => {
                 const datosRespuesta = await respuestaServidor.json();
 
                 if (respuestaServidor.ok) {
-                    // Si el login fue exitoso (Código 200)
                     const rolAsignado = datosRespuesta.identificador_rol_usuario;
 
+                    // NUEVA LÍNEA AGREGADA: Guardar datos del usuario en la memoria del navegador
+                    localStorage.setItem("usuario_session", JSON.stringify(datosRespuesta));
+
                     if (rolAsignado === 1) {
-                        window.location.href = "admin/admin_jimena.html";
+                    window.location.href = "admin/admin_jimena.html";
                     } else if (rolAsignado === 2) {
-                        window.location.href = "medico/medico_panel.html";
+                    window.location.href = "medico/medico_panel.html";
                     } else if (rolAsignado === 3) {
-                        window.location.href = "recepcion/recepcion_melissa.html";
+                    window.location.href = "recepcion/recepcion_melissa.html";
                     } else {
-                        mostrarMensajeError("Error: Rol de usuario desconocido.");
+                    mostrarMensajeError("Error: Rol de usuario desconocido.");
                     }
                 } else {
-                    // Si el servidor responde con error (ej. 401 Credenciales incorrectas)
                     const mensajeBackend = datosRespuesta.detail || "Usuario o contraseña incorrectos.";
                     mostrarMensajeError(mensajeBackend);
                 }
             } catch (error) {
-                // Si la API o el servidor FastAPI están apagados
                 mostrarMensajeError("Error de conexión con el servidor. Verifique que el backend esté ejecutándose.");
             }
         });
     }
 
-    // Función auxiliar para desplegar el mensaje de error de forma visible
     function mostrarMensajeError(mensaje) {
         if (contenedorError) {
             contenedorError.textContent = mensaje;
             contenedorError.style.display = "block";
-            contenedorError.style.color = "#d9534f"; // Rojo accesible
+            contenedorError.style.color = "#d9534f";
         } else {
             alert(mensaje);
         }
