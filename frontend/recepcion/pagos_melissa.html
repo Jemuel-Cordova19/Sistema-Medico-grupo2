@@ -1,3 +1,40 @@
 <!DOCTYPE html>
 <html lang="es"><head><meta charset="UTF-8"><title>Registro de Pagos</title><link rel="stylesheet" href="../css/styles.css"></head>
-<body><div class="container"><h1>Registro de Pagos</h1><p>Módulo de Melissa</p><a href="recepcion_melissa.html" class="btn">Volver</a></div></body></html>
+<body><div class="container"><h1>Registro de Pagos</h1><p>Módulo de Melissa</p><a href="recepcion_melissa.html" class="btn">Volver</a>
+    <!-- Formulario para ingresar un nuevo pago -->
+        <div class="seccion-formulario" style="margin-top: 20px;">
+            <h3>Registrar Nuevo Pago</h3>
+            <form id="form-pago">
+                <input type="text" placeholder="Nombre del Paciente" required><br><br>
+                <input type="number" step="0.01" placeholder="Monto a Pagar (Q)" required><br><br>
+                <label for="metodo">Método de Pago:</label>
+                <select id="metodo" required>
+                    <option value="efectivo">Efectivo</option>
+                    <option value="tarjeta">Tarjeta de Crédito/Débito</option>
+                    <option value="transferencia">Transferencia Bancaria</option>
+                </select><br><br>
+                <button type="submit">Confirmar Pago</button>
+            </form>
+        </div>
+
+        <!-- Tabla para listar los pagos realizados -->
+        <div class="seccion-tabla" style="margin-top: 30px;">
+            <h3>Historial de Pagos Recibidos</h3>
+            <table border="1" style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr>
+                        <th>Paciente</th>
+                        <th>Monto</th>
+                        <th>Método de Pago</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Aquí se cargarán los pagos dinámicamente -->
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</body>
+</html>
