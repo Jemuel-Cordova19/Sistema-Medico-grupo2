@@ -1,20 +1,73 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Panel Médico</title>
-  <link rel="stylesheet" href="../css/styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel del Médico</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f6f9; margin: 0; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eaeaea; padding-bottom: 15px; margin-bottom: 20px; }
+        .header h1 { margin: 0; color: #333; font-size: 24px; }
+        .btn-logout { background-color: #d9534f; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn-logout:hover { background-color: #c9302c; }
+        .card { background: #ffffff; border: 1px solid #e9ecef; border-radius: 6px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #e0e0e0; padding: 12px; text-align: left; }
+        th { background-color: #007bff; color: white; }
+        tr:nth-child(even) { background-color: #f8f9fa; }
+        .btn-primary { background-color: #007bff; color: white; padding: 8px 14px; text-decoration: none; border-radius: 4px; font-size: 14px; display: inline-block; }
+        .btn-secondary { background-color: #17a2b8; color: white; padding: 8px 14px; text-decoration: none; border-radius: 4px; font-size: 14px; display: inline-block; }
+        .actions-container { display: flex; gap: 10px; margin-top: 15px; }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Módulo de Atención Médica</h1>
-    <p>Atención de consultas e historia clínica.</p>
-    <ul>
-      <li><a href="consultas_medico.html">Registrar Consulta / Signos Vitales</a></li>
-      <li><a href="recetas_medico.html">Emitir Receta Médica</a></li>
-    </ul>
-    <br><a href="../dashboard.html" class="btn">Volver al Inicio</a>
-  </div>
-  <script src="../js/medico.js"></script>
+
+    <div class="container">
+        <!-- Encabezado con bienvenida y botón de salida -->
+        <div class="header">
+            <div>
+                <h1 id="nombre_medico">Dr. Citing</h1>
+                <p style="margin: 5px 0 0; color: #666;">Módulo de Atención Médica e Historial Clínico</p>
+            </div>
+            <button id="cerrar_sesion" class="btn-logout">Cerrar Sesión</button>
+        </div>
+
+        <!-- Tabla de Citas Asignadas -->
+        <div class="card">
+            <h2 style="margin-top: 0; color: #007bff;">Pacientes y Citas Asignadas</h2>
+            <p style="color: #555;">Lista de pacientes asignados o con cita agendada:</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Hora</th>
+                        <th>Paciente</th>
+                        <th>Motivo de Consulta</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla_citas">
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: #777;">Cargando citas del médico...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Accesos Directos del Módulo  
+        <div class="card">
+            <h3>Gestión Directa</h3>
+            <div class="actions-container">
+                <a href="consultas_medico.html" class="btn-primary">Registrar Consulta / Signos Vitales</a>
+                <a href="recetas_medico.html" class="btn-secondary">Emitir Receta Médica</a>
+            </div>
+        </div> 
+        -->
+    </div>
+
+    <!-- Script específico del médico -->
+    <script src="../js/medico.js"></script>
 </body>
 </html>

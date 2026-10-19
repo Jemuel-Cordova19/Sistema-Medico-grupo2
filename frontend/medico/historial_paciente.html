@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial Médico del Paciente</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f6f9; margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h2 { color: #007bff; margin-top: 0; }
+        .btn-volver { display: inline-block; margin-bottom: 20px; padding: 8px 15px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 4px; }
+        .btn-volver:hover { background-color: #5a6268; }
+        .consulta-card { border: 1px solid #ddd; border-radius: 6px; padding: 20px; margin-bottom: 15px; background: #fafafa; }
+        .consulta-header { font-weight: bold; color: #333; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px; display: flex; justify-content: space-between; }
+        .grid-datos { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; font-size: 14px; margin-bottom: 10px; }
+        .etiqueta { font-weight: bold; color: #555; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="medico_panel.html" class="btn-volver">← Volver al Panel</a>
+    <h2>Historial Clínico del Paciente</h2>
+    <div id="contenedor-historial">
+        <p style="text-align: center; color: #666;">Cargando historial médico...</p>
+    </div>
+</div>
+
+<script>
+    // Aquí empieza la lógica para cargar el historial del paciente desde la URL
+    document.addEventListener("DOMContentLoaded", async () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const pacienteId = urlParams.get("paciente_id");
+
+        if (!pacienteId) {
+            document.getElementById("contenedor-historial").innerHTML = "<p style='color: red;'>No se especificó un paciente.</p>";
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://127.0.0.1:8000/medico/historial-paciente/${pacienteId}`);
+            const historial = await response.json();
+
+            const contenedor = document.getElementById("contenedor-historial");
+
+            if (!historial || historial.length === 0) {
+                contenedor.innerHTML = "<p style='text-align: center; color: #666;'>Este paciente no registra consultas anteriores.</p>";
+                return;
+            }
+
+            contenedor.innerHTML = ""; // Limpiar mensaje de carga
+            historial.forEach((h, index) => {
+                const fecha = h.fecha_hora || h.fecha_creacion || "Fecha no registrada";
+                
+                contenedor.innerHTML += `
+                    <div class="consulta-card">
+                        <div class="consulta-header">
+                            <span>Consulta #${historial.length - index}</span>
+                            <span>fecha: ${fecha}</span>
+                        </div>
+                        <div class="grid-datos">
+                            <div><span class="etiqueta">Motivo:</span> ${h.motivo_consulta || 'N/A'}</div>
+                            <div><span class="etiqueta">Síntomas:</span> ${h.sintomas || 'N/A'}</div>
+                            <div><span class="etiqueta">Presión Arterial:</span> ${h.presion_arterial || 'N/A'}</div>
+                            <div><span class="etiqueta">Temperatura:</span> ${h.temperatura || 'N/A'} °C</div>
+                            <div><span class="etiqueta">Peso:</span> ${h.peso || 'N/A'} kg</div>
+                            <div><span class="etiqueta">Frecuencia Cardíaca:</span> ${h.frecuencia_cardiaca || 'N/A'} lpm</div>
+                        </div>
+                        <div style="margin-top: 10px; font-size: 14px;">
+                            <p><strong>Diagnóstico:</strong> ${h.diagnostico || 'N/A'}</p>
+                            <p><strong>Tratamiento / Receta:</strong> ${h.tratamiento_indicado || 'N/A'}</p>
+                        </div>
+                    </div>
+                `;
+            });
+
+        } catch (error) {
+            console.error("Error al cargar el historial:", error);
+            document.getElementById("contenedor-historial").innerHTML = "<p style='color: red; text-align: center;'>Error al conectar con el servidor para obtener el historial.</p>";
+        }
+    });
+</script>
+
+</body>
+</html>

@@ -1,3 +1,134 @@
 <!DOCTYPE html>
-<html lang="es"><head><meta charset="UTF-8"><title>Consultas Médicas</title><link rel="stylesheet" href="../css/styles.css"></head>
-<body><div class="container"><h1>Consulta e Historial Clínico</h1><a href="medico_panel.html" class="btn">Volver</a></div></body></html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atención Médica - Consulta</title>
+    <link rel="stylesheet" href="../css/estilos.css">
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f6f9; margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h2, h3 { color: #2c3e50; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
+        .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 15px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #333; font-size: 14px; }
+        input[type="text"], input[type="number"], textarea, select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        textarea { resize: vertical; height: 70px; }
+        .section-title { border-bottom: 2px solid #3498db; padding-bottom: 5px; margin-top: 25px; margin-bottom: 15px; color: #2c3e50; }
+        .btn-container { display: flex; justify-content: space-between; margin-top: 30px; }
+        .btn-primary { background-color: #27ae60; color: white; padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; font-size: 16px; font-weight: bold; }
+        .btn-primary:hover { background-color: #219150; }
+        .btn-secondary { background-color: #95a5a6; color: white; padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; font-size: 16px; }
+        .btn-secondary:hover { background-color: #7f8c8d; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Atención de Cita Médica #<span id="id-cita-txt">--</span></h2>
+        
+        <form id="form-consulta">
+            
+            <!-- 1. Signos Vitales -->
+            <h3 class="section-title">1. Signos Vitales y Medidas</h3>
+            <div class="grid-4">
+                <div class="form-group">
+                    <label for="presion">Presión Arterial:</label>
+                    <input type="text" id="presion" required placeholder="Ej. 120/80 mmHg">
+                </div>
+                <div class="form-group">
+                    <label for="temperatura">Temperatura (°C):</label>
+                    <input type="number" step="0.1" id="temperatura" required placeholder="Ej. 36.5">
+                </div>
+                <div class="form-group">
+                    <label for="peso">Peso (kg):</label>
+                    <input type="number" step="0.1" id="peso" required placeholder="Ej. 70.5">
+                </div>
+                <div class="form-group">
+                    <label for="frecuencia_cardiaca">Frec. Cardíaca (bpm):</label>
+                    <input type="number" id="frecuencia_cardiaca" required placeholder="Ej. 75">
+                </div>
+            </div>
+
+            <!-- 2. Historia Clínica y Antecedentes -->
+            <h3 class="section-title">2. Evaluación y Antecedentes Médicos</h3>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label for="motivo_consulta">Motivo de Consulta:</label>
+                    <textarea id="motivo_consulta" required placeholder="Causa principal de la visita..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="sintomas">Síntomas / Padecimiento Actual:</label>
+                    <textarea id="sintomas" required placeholder="Descripción detallada de síntomas..."></textarea>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="form-group">
+                    <label for="antecedentes">Antecedentes Importantes:</label>
+                    <textarea id="antecedentes" placeholder="Enfermedades previas, cirugías, antecedentes familiares..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="alergias">Alergias Conocidas:</label>
+                    <textarea id="alergias" placeholder="Alergias a medicamentos, alimentos o sustancias..."></textarea>
+                </div>
+            </div>
+
+            <!-- 3. Diagnóstico y Observaciones -->
+            <h3 class="section-title">3. Diagnóstico y Observaciones</h3>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label for="diagnostico">Diagnóstico Médico:</label>
+                    <textarea id="diagnostico" required placeholder="Diagnóstico definitivo o presuntivo..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="observaciones">Observaciones Clínicas:</label>
+                    <textarea id="observaciones" placeholder="Notas adicionales o recomendaciones generales..."></textarea>
+                </div>
+            </div>
+
+            <!-- 4. Receta Médica -->
+            <h3 class="section-title">4. Receta Médica / Prescripción</h3>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label for="medicamento">Medicamento:</label>
+                    <input type="text" id="medicamento" required placeholder="Ej. Paracetamol">
+                </div>
+                <div class="form-group">
+                    <label for="presentacion">Presentación:</label>
+                    <input type="text" id="presentacion" placeholder="Ej. Tabletas 500mg, Jarabe">
+                </div>
+            </div>
+
+            <div class="grid-3">
+                <div class="form-group">
+                    <label for="dosis">Dosis:</label>
+                    <input type="text" id="dosis" placeholder="Ej. 1 tableta">
+                </div>
+                <div class="form-group">
+                    <label for="frecuencia">Frecuencia:</label>
+                    <input type="text" id="frecuencia" placeholder="Ej. Cada 8 horas">
+                </div>
+                <div class="form-group">
+                    <label for="duracion">Duración:</label>
+                    <input type="text" id="duracion" placeholder="Ej. Por 5 días">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="indicaciones">Indicaciones Adicionales / Tratamiento Indicado:</label>
+                <textarea id="indicaciones" placeholder="Medidas generales, reposo, dieta, cuidados..."></textarea>
+            </div>
+
+            <div class="btn-container">
+                <a href="medico_panel.html" class="btn-secondary">Volver al Panel</a>
+                <button type="submit" class="btn-primary">Guardar Consulta y Finalizar Cita</button>
+            </div>
+        </form>
+    </div>
+
+    <script src="../js/consultas_medico.js"></script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-# Importamos la clase FastAPI y la dependencia de sesión de SQLAlchemy
+# Importamos la clase FastAPI y las dependencias necesarias
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
@@ -6,10 +6,12 @@ from sqlalchemy import text
 
 # Importamos la base de datos, el motor y la base declarativa
 from backend.database import get_db, engine, Base
-
-# Importamos los modelos para que SQLAlchemy los reconozca al crear las tablas
 from backend import models
+
+# Importamos los routers de autenticación y de historial médico
 from backend.routers.auth_medico import enrutador_autenticacion_medico
+from backend.routers import medico_historial
+
 # Esta instrucción crea automáticamente todas las tablas en Supabase
 Base.metadata.create_all(bind=engine)
 
@@ -20,26 +22,34 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Configuración de CORS para permitir la conexión desde cualquier cliente/frontend
+# Configuración de CORS para permitir la conexión desde el frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Permite peticiones de cualquier origen
-    allow_credentials=True, # Permite el envío de credenciales
-    allow_methods=["*"], # Permite todos los métodos HTTP
-    allow_headers=["*"] # Permite todos los encabezados HTTP
+    allow_origins=["*"],        # Permite peticiones de cualquier origen
+    allow_credentials=True,     # Permite el envío de credenciales
+    allow_methods=["*"],        # Permite todos los métodos HTTP
+    allow_headers=["*"],        # Permite todos los encabezados HTTP
 )
+
+# -------------------------------------------------------------
+# INCLUSIÓN DE ROUTERS (ENRUTADORES DEL SISTEMA)
+# -------------------------------------------------------------
+app.include_router(enrutador_autenticacion_medico)
+app.include_router(medico_historial.router)
+
+# -------------------------------------------------------------
+# RUTAS DE COMPROBACIÓN DEL SERVIDOR
+# -------------------------------------------------------------
 
 # Ruta raíz de comprobación de estado del servidor
 @app.get("/")
 def read_root():
-    # Retorna un estado informativo
     return {"status": "ok", "message": "API del Sistema Médico en ejecución"}
 
 # Ruta para verificar la comunicación directa con PostgreSQL en Supabase
 @app.get("/test-db")
 def test_db_connection(db: Session = Depends(get_db)):
     try:
-        # Ejecutamos una consulta SQL para verificar la versión instalada de PostgreSQL
         result = db.execute(text("SELECT version();")).fetchone()
         return {
             "status": "success",
@@ -47,9 +57,7 @@ def test_db_connection(db: Session = Depends(get_db)):
             "db_version": result[0]
         }
     except Exception as e:
-        # En caso de error de conexión, se retorna una respuesta HTTP 500
         raise HTTPException(
             status_code=500,
             detail=f"Error al conectar con la base de datos: {str(e)}"
         )
-app.include_router(enrutador_autenticacion_medico) 
